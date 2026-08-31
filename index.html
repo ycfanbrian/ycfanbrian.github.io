@@ -13,36 +13,42 @@
 <style>
 /* ============ TOKENS ============ */
 :root{
-  --bg:#F1F3F1;
-  --surface:#FFFFFF;
-  --surface-2:#E8EBE8;
-  --ink:#14181A;
-  --muted:#5C6560;
-  --line:rgba(20,24,26,.13);
-  --accent:#2E6F5E;
-  --accent-ink:#2E6F5E;
-  --accent-soft:rgba(46,111,94,.10);
-  --amber:#A9711B;
-  --particle:46,111,94;
-  --shadow:0 1px 2px rgba(20,24,26,.04),0 8px 24px rgba(20,24,26,.05);
+  --bg:#E4ECF1;
+  --surface:#F4F8FA;
+  --surface-2:#D6E2E9;
+  --ink:#17242B;
+  --muted:#54666F;
+  --line:rgba(23,36,43,.15);
+  --accent:#2A6A5E;
+  --accent-ink:#2A6A5E;
+  --accent-soft:rgba(42,106,94,.10);
+  --amber:#9C6B1E;
+  --shadow:0 1px 2px rgba(23,36,43,.05),0 8px 24px rgba(23,36,43,.06);
+  --grain:.058;
+  --grain-blend:multiply;
+  --vignette:rgba(23,36,43,.07);
+  --warmth:rgba(196,150,84,.05);
   --font-display:'Bricolage Grotesque','Noto Sans SC',system-ui,-apple-system,sans-serif;
   --font-body:'Inter','Noto Sans SC',system-ui,-apple-system,sans-serif;
   --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --maxw:1080px;
 }
 html[data-theme="dark"]{
-  --bg:#0D1211;
-  --surface:#141B19;
-  --surface-2:#1C2523;
-  --ink:#E7EDE9;
-  --muted:#93A09A;
-  --line:rgba(231,237,233,.15);
-  --accent:#5FCBA6;
-  --accent-ink:#5FCBA6;
-  --accent-soft:rgba(95,203,166,.12);
-  --amber:#E0B25E;
-  --particle:95,203,166;
+  --bg:#0C1418;
+  --surface:#121C21;
+  --surface-2:#1A262C;
+  --ink:#E3ECEF;
+  --muted:#8FA2AA;
+  --line:rgba(227,236,239,.15);
+  --accent:#5FC9AF;
+  --accent-ink:#5FC9AF;
+  --accent-soft:rgba(95,201,175,.12);
+  --amber:#DDB067;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+  --grain:.05;
+  --grain-blend:overlay;
+  --vignette:rgba(0,0,0,.26);
+  --warmth:rgba(196,150,84,.035);
 }
 
 *,*::before,*::after{box-sizing:border-box}
@@ -58,8 +64,28 @@ a{color:inherit}
 img{max-width:100%;display:block}
 ::selection{background:var(--accent);color:var(--bg)}
 
-/* ============ PARTICLES ============ */
-#particles{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.85}
+/* ============ FILM LAYER ============ */
+.film{position:fixed;inset:0;pointer-events:none;z-index:3}
+.film-grain{
+  position:absolute;inset:-50%;
+  opacity:var(--grain);mix-blend-mode:var(--grain-blend);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:190px 190px;
+  animation:grainshift 6s steps(6) infinite;
+}
+@keyframes grainshift{
+  0%{transform:translate(0,0)}      16%{transform:translate(-3%,2%)}
+  33%{transform:translate(2%,-3%)}  50%{transform:translate(-2%,-2%)}
+  66%{transform:translate(3%,1%)}   83%{transform:translate(-1%,3%)}
+  100%{transform:translate(0,0)}
+}
+.film-vignette{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(115% 85% at 50% 42%, transparent 52%, var(--vignette) 100%),
+    radial-gradient(80% 70% at 78% 12%, var(--warmth), transparent 62%);
+}
+@media(prefers-reduced-motion:reduce){.film-grain{animation:none}}
 
 /* ============ LAYOUT ============ */
 .wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 28px}
@@ -90,7 +116,6 @@ header.scrolled{border-bottom-color:var(--line);background:color-mix(in srgb,var
   font-family:var(--font-display);font-weight:700;font-size:17px;
   letter-spacing:-.01em;text-decoration:none;margin-right:auto;white-space:nowrap;
 }
-.brand span{color:var(--accent-ink)}
 .nav-links{display:flex;gap:26px;list-style:none;margin:0;padding:0}
 .nav-links a{
   font-size:14px;text-decoration:none;color:var(--muted);
@@ -154,7 +179,6 @@ h1{
   font-size:clamp(18px,2.6vw,26px);font-weight:500;min-height:1.6em;
   margin:0 0 26px;display:flex;align-items:center;gap:2px;flex-wrap:wrap;
 }
-.typed-prefix{color:var(--muted);margin-right:10px}
 #typed{color:var(--ink);font-weight:600;border-bottom:2px solid var(--accent-soft)}
 .caret{display:inline-block;width:2px;height:1.05em;background:var(--accent);
   margin-left:3px;animation:blink 1s steps(1) infinite;vertical-align:-.15em}
@@ -252,6 +276,11 @@ h1{
   font-size:12.8px;color:var(--muted);border-left:2px solid var(--line);
   padding-left:13px;margin-top:16px;line-height:1.6;font-style:italic;
 }
+/* 论文链接：无下划线，点击前后颜色完全不变 */
+a.plain,a.plain:link,a.plain:visited,a.plain:hover,a.plain:active,a.plain:focus{
+  color:inherit;text-decoration:none;border:none;outline:none;
+  -webkit-tap-highlight-color:transparent;cursor:pointer;
+}
 
 /* ============ EDUCATION ============ */
 .edu-item{
@@ -317,11 +346,14 @@ footer{
 </head>
 
 <body>
-<canvas id="particles" aria-hidden="true"></canvas>
+<div class="film" aria-hidden="true">
+  <div class="film-grain"></div>
+  <div class="film-vignette"></div>
+</div>
 
 <header id="header">
   <nav class="nav">
-    <a href="#top" class="brand">范逸臣<span>.</span></a>
+    <a href="#top" class="brand" data-zh="范逸臣" data-en="Yichen FAN">范逸臣</a>
     <ul class="nav-links">
       <li><a href="#about"      data-zh="关于"     data-en="About">关于</a></li>
       <li><a href="#timeline"   data-zh="动态"     data-en="Timeline">动态</a></li>
@@ -357,7 +389,6 @@ footer{
         <p class="tagline" data-zh="市场营销 · 产品经理 · 商业分析" data-en="Marketing · Product · Business Analytics">市场营销 · 产品经理 · 商业分析</p>
 
         <p class="typed-line">
-          <span class="typed-prefix" data-zh="我是" data-en="I work in">我是</span>
           <span id="typed"></span><span class="caret" aria-hidden="true"></span>
         </p>
 
@@ -393,17 +424,17 @@ footer{
     <div class="about-grid">
       <div class="about-text reveal">
         <p class="lead"
-           data-zh="我是范逸臣，目前在墨尔本大学攻读管理学硕士（市场营销方向），本科毕业于 UIC 创新创业专业，获荣誉学位。"
-           data-en="I'm Yichen Fan. I'm reading for a Master of Management (Marketing) at the University of Melbourne, after an Honours degree in Entrepreneurship and Innovation at UIC.">我是范逸臣，目前在墨尔本大学攻读管理学硕士（市场营销方向），本科毕业于 UIC 创新创业专业，获荣誉学位。</p>
+           data-zh="你好，我是范逸臣，目前就读于墨尔本大学 Master of Management (Marketing)，预计于 2027 年 12 月毕业。"
+           data-en="Hi, I'm Yichen Fan, currently pursuing a Master of Management (Marketing) at the University of Melbourne, with an expected graduation date of December 2027.">你好，我是范逸臣，目前就读于墨尔本大学 Master of Management (Marketing)，预计于 2027 年 12 月毕业。</p>
 
-        <p data-zh="过去两年，我在字节跳动做过 AI 与云业务方向的招聘实习，同时推进多个招聘项目、协调 300 多通候选人沟通；也在万宝盛华做过人力资源运营，负责百人规模的薪酬核算与合规审核，并把流程做了自动化提效。"
-           data-en="Over the past two years I interned at ByteDance on AI &amp; Cloud talent acquisition, running several hiring projects in parallel and coordinating 300+ candidate conversations. Before that, at ManpowerGroup, I handled payroll and compliance for a 100+ headcount project and automated the workflow behind it.">过去两年，我在字节跳动做过 AI 与云业务方向的招聘实习，同时推进多个招聘项目、协调 300 多通候选人沟通；也在万宝盛华做过人力资源运营，负责百人规模的薪酬核算与合规审核，并把流程做了自动化提效。</p>
+        <p data-zh="我对产品、用户需求和商业问题尤其感兴趣，也喜欢从数据和真实用户场景中发现问题，再寻找更有效的解决方式。过去我曾在字节跳动和 ManpowerGroup 实习，参与过数据处理、流程优化、项目协调和用户沟通相关工作，同时也具备 Excel、Power BI 和基础 Python 的数据分析能力。"
+           data-en="I am particularly interested in products, user needs, and business problem-solving. I enjoy identifying problems through data and real user scenarios, then exploring practical ways to improve the experience or process. Through my previous internships at ByteDance and ManpowerGroup, I gained experience in data analysis, process improvement, project coordination, and stakeholder communication. I am also comfortable working with Excel and Power BI, with basic Python skills.">我对产品、用户需求和商业问题尤其感兴趣，也喜欢从数据和真实用户场景中发现问题，再寻找更有效的解决方式。过去我曾在字节跳动和 ManpowerGroup 实习，参与过数据处理、流程优化、项目协调和用户沟通相关工作，同时也具备 Excel、Power BI 和基础 Python 的数据分析能力。</p>
 
-        <p data-zh="学术上，我参与了三项研究：职场年龄歧视干预、领导幽默对员工绩效的影响、以及非西方情境下社会创业的资源配置。三项成果分别在 SIOP、EURAM 和 AAOM 国际会议发表，我在其中负责数据收集、清洗与统计分析。"
-           data-en="On the research side, I've worked on three studies: interventions against workplace age discrimination, the effect of supervisor humour on employee performance, and resource configurations for social entrepreneurship outside Western markets. All three were presented at SIOP, EURAM and AAOM; I handled data collection, cleaning and statistical analysis.">学术上，我参与了三项研究：职场年龄歧视干预、领导幽默对员工绩效的影响、以及非西方情境下社会创业的资源配置。三项成果分别在 SIOP、EURAM 和 AAOM 国际会议发表，我在其中负责数据收集、清洗与统计分析。</p>
+        <p data-zh="除了实习和学术项目之外，我目前也在墨尔本运营一个小型租房服务业务，根据客户的实际需求筛选和推荐房源，并进行实地看房和房屋情况检查。这段经历让我有机会真正接触用户需求，理解他们在决策过程中遇到的问题，并不断思考如何让整个过程更加高效、清晰和可靠。"
+           data-en="Outside of internships and academic projects, I currently run a small rental support business in Melbourne, where I help clients screen and compare properties based on their needs, conduct in-person inspections, and provide information to support their rental decisions. This experience has given me direct exposure to real user needs and has strengthened my ability to understand pain points, evaluate options, and think about how a process can be made more efficient and reliable.">除了实习和学术项目之外，我目前也在墨尔本运营一个小型租房服务业务，根据客户的实际需求筛选和推荐房源，并进行实地看房和房屋情况检查。这段经历让我有机会真正接触用户需求，理解他们在决策过程中遇到的问题，并不断思考如何让整个过程更加高效、清晰和可靠。</p>
 
-        <p data-zh="现在我在寻找市场营销与产品方向的机会——我擅长的部分，是把用户数据和市场信号翻译成团队真正能落地的决策。"
-           data-en="I'm now looking for roles in marketing and product. What I'm good at is turning user data and market signals into decisions a team can actually act on.">现在我在寻找市场营销与产品方向的机会——我擅长的部分，是把用户数据和市场信号翻译成团队真正能落地的决策。</p>
+        <p data-zh="我喜欢团队合作，也习惯主动沟通、拆解问题并推动事情向前发展。未来，我希望继续探索产品、产品运营、商业分析以及与用户体验相关的工作，把用户洞察、数据分析和执行能力结合起来，创造真正有价值的产品和服务。"
+           data-en="I enjoy working in collaborative environments and value proactive communication, structured problem-solving, and strong execution. Going forward, I hope to explore opportunities in product management, product operations, business analysis, and user-focused roles, combining user insight, analytical thinking, and execution to create meaningful products and services.">我喜欢团队合作，也习惯主动沟通、拆解问题并推动事情向前发展。未来，我希望继续探索产品、产品运营、商业分析以及与用户体验相关的工作，把用户洞察、数据分析和执行能力结合起来，创造真正有价值的产品和服务。</p>
       </div>
 
       <dl class="facts reveal">
@@ -417,7 +448,7 @@ footer{
         </div>
         <div class="fact">
           <dt data-zh="求职方向" data-en="Looking for">求职方向</dt>
-          <dd data-zh="市场营销 · 产品管理" data-en="Marketing · Product Management">市场营销 · 产品管理</dd>
+          <dd data-zh="产品 · 产品运营 · 商业分析" data-en="Product · Product Ops · Business Analysis">产品 · 产品运营 · 商业分析</dd>
         </div>
         <div class="fact">
           <dt data-zh="语言" data-en="Languages">语言</dt>
@@ -439,6 +470,12 @@ footer{
     <h2 class="sec-title reveal" data-zh="最近发生了什么" data-en="What I've been up to">最近发生了什么</h2>
 
     <ul class="timeline">
+      <li class="tl-item reveal">
+        <div class="tl-date">2026.08</div>
+        <div class="tl-body"><p class="tl-text"
+          data-zh="在墨尔本开始运营小型租房服务业务，为客户筛选房源、实地看房并出具房况反馈"
+          data-en="Started running a small rental support service in Melbourne — screening listings, inspecting properties in person and reporting back to clients">在墨尔本开始运营小型租房服务业务，为客户筛选房源、实地看房并出具房况反馈</p></div>
+      </li>
       <li class="tl-item reveal">
         <div class="tl-date">2026.07</div>
         <div class="tl-body"><p class="tl-text"
@@ -506,7 +543,7 @@ footer{
     <div class="cards">
       <article class="card reveal">
         <div class="card-head">
-          <h3 class="card-title" data-zh="职场年龄歧视干预研究" data-en="Reducing Age Discrimination at Work">职场年龄歧视干预研究</h3>
+          <h3 class="card-title"><a class="plain" href="age-discrimination-siop2026.pdf" target="_blank" rel="noopener noreferrer" data-zh="职场年龄歧视干预研究" data-en="Reducing Age Discrimination at Work">职场年龄歧视干预研究</a></h3>
           <span class="card-meta">2025.09 – 2026.05 · SIOP 2026</span>
         </div>
         <p class="card-role" data-zh="研究成员 · 数据分析与统计建模" data-en="Researcher · Data analysis &amp; statistical modelling">研究成员 · 数据分析与统计建模</p>
@@ -522,12 +559,12 @@ footer{
           <span class="tag">SPSS 27</span><span class="tag">Logistic Regression</span>
           <span class="tag">Mixed-Effects Models</span><span class="tag">PROCESS</span>
         </div>
-        <p class="cite">Su, N., Yu, M., &amp; Fan, Y. (2026, April 30 – May 2). Employer-Focused Sample Interventions to Reduce Age Discrimination Against Older Workers [Poster]. Society for Industrial and Organizational Psychology Annual Conference, New Orleans, LA, United States.</p>
+        <p class="cite"><a class="plain" href="age-discrimination-siop2026.pdf" target="_blank" rel="noopener noreferrer">Su, N., Yu, M., &amp; Fan, Y. (2026, April 30 – May 2). Employer-Focused Sample Interventions to Reduce Age Discrimination Against Older Workers [Poster]. Society for Industrial and Organizational Psychology Annual Conference, New Orleans, LA, United States.</a></p>
       </article>
 
       <article class="card reveal">
         <div class="card-head">
-          <h3 class="card-title" data-zh="领导幽默与员工绩效研究" data-en="Supervisor Humour &amp; Employee Performance">领导幽默与员工绩效研究</h3>
+          <h3 class="card-title"><a class="plain" href="leader-humor-euram2025.pdf" target="_blank" rel="noopener noreferrer" data-zh="领导幽默与员工绩效研究" data-en="Supervisor Humour &amp; Employee Performance">领导幽默与员工绩效研究</a></h3>
           <span class="card-meta">2024.09 – 2025.06 · EURAM 2025</span>
         </div>
         <p class="card-role" data-zh="研究成员 · 组织行为学" data-en="Researcher · Organisational Behaviour">研究成员 · 组织行为学</p>
@@ -543,12 +580,12 @@ footer{
           <span class="tag">Cross-Cultural Study</span><span class="tag">LMX</span>
           <span class="tag">Moderation Analysis</span><span class="tag">Conference Talk</span>
         </div>
-        <p class="cite">Jun, K., Su, N., Yu, M., Fan, Y., Wang, J., Li, Y., &amp; Peng, Y. (2025). Supervisor's humor and employee performance: Roles of emotion and Leader-Member Exchange. European Academy of Management Annual Conference 2025, Florence, Italy.</p>
+        <p class="cite"><a class="plain" href="leader-humor-euram2025.pdf" target="_blank" rel="noopener noreferrer">Jun, K., Su, N., Yu, M., Fan, Y., Wang, J., Li, Y., &amp; Peng, Y. (2025). Supervisor's humor and employee performance: Roles of emotion and Leader-Member Exchange. European Academy of Management Annual Conference 2025, Florence, Italy.</a></p>
       </article>
 
       <article class="card reveal">
         <div class="card-head">
-          <h3 class="card-title" data-zh="非西方情境下的社会创业研究" data-en="Social Entrepreneurship Beyond the West">非西方情境下的社会创业研究</h3>
+          <h3 class="card-title"><a class="plain" href="social-entrepreneurship-aaom2025.pdf" target="_blank" rel="noopener noreferrer" data-zh="非西方情境下的社会创业研究" data-en="Social Entrepreneurship Beyond the West">非西方情境下的社会创业研究</a></h3>
           <span class="card-meta">2024.09 – 2025.06 · AAOM 2025</span>
         </div>
         <p class="card-role" data-zh="研究助理 · 战略管理" data-en="Research Assistant · Strategic Management">研究助理 · 战略管理</p>
@@ -562,7 +599,7 @@ footer{
           <span class="tag">fsQCA</span><span class="tag">Strategy</span>
           <span class="tag">Social Enterprise</span><span class="tag">Emerging Markets</span>
         </div>
-        <p class="cite">Su, N., &amp; Fan, Y. (2025). Resource configurations and social entrepreneurship in regional expansion in non-Western countries: An empirical analysis based on fsQCA. Asia Academy of Management 2025 Special Conference, Bangkok, Thailand.</p>
+        <p class="cite"><a class="plain" href="social-entrepreneurship-aaom2025.pdf" target="_blank" rel="noopener noreferrer">Su, N., &amp; Fan, Y. (2025). Resource configurations and social entrepreneurship in regional expansion in non-Western countries: An empirical analysis based on fsQCA. Asia Academy of Management 2025 Special Conference, Bangkok, Thailand.</a></p>
       </article>
     </div>
   </div>
@@ -571,8 +608,8 @@ footer{
 <!-- ============ EXPERIENCE ============ -->
 <section id="experience">
   <div class="wrap">
-    <p class="eyebrow reveal" data-zh="实习经历" data-en="Experience">实习经历</p>
-    <h2 class="sec-title reveal" data-zh="在大厂与咨询公司做过的事" data-en="Where I've worked">在大厂与咨询公司做过的事</h2>
+    <p class="eyebrow reveal" data-zh="职业经历" data-en="Professional Experiences">职业经历</p>
+    <h2 class="sec-title reveal" data-zh="工作过的地方" data-en="Where I've worked">工作过的地方</h2>
 
     <div class="cards">
       <article class="card reveal">
@@ -646,7 +683,7 @@ footer{
       <div class="edu-item">
         <div>
           <h3 class="edu-school" data-zh="牛津大学" data-en="University of Oxford">牛津大学</h3>
-          <p class="edu-degree" data-zh="Python 数据科学暑期项目 · 英国 牛津" data-en="Data Science with Python Summer Programme · Oxford, UK">Python 数据科学暑期项目 · 英国 牛津</p>
+          <p class="edu-degree" data-zh="Python 数据科学暑期项目（短期课程）· 英国 牛津" data-en="Data Science with Python Summer Programme (short course) · Oxford, UK">Python 数据科学暑期项目（短期课程）· 英国 牛津</p>
         </div>
         <div class="edu-when" data-zh="2025.08" data-en="Aug 2025">2025.08</div>
       </div>
@@ -816,78 +853,6 @@ footer{
     }
   }
 
-  /* ---------- 4. 粒子背景 ---------- */
-  var cv = document.getElementById("particles");
-  var ctx = cv.getContext("2d");
-  var pts = [], W = 0, H = 0, dpr = 1, raf = null;
-
-  function accent(){
-    return getComputedStyle(document.documentElement).getPropertyValue("--particle").trim();
-  }
-  function build(){
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
-    cv.width = W * dpr; cv.height = H * dpr;
-    cv.style.width = W + "px"; cv.style.height = H + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    var n = Math.max(26, Math.min(78, Math.round(W * H / 20000)));
-    pts = [];
-    for(var i=0;i<n;i++){
-      pts.push({
-        x: Math.random()*W, y: Math.random()*H,
-        vx:(Math.random()-.5)*0.24, vy:(Math.random()-.5)*0.24,
-        r: Math.random()*1.5 + 0.9
-      });
-    }
-  }
-  function draw(){
-    var c = accent();
-    ctx.clearRect(0,0,W,H);
-    var link = Math.min(150, W*0.16);
-
-    for(var i=0;i<pts.length;i++){
-      for(var j=i+1;j<pts.length;j++){
-        var dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y;
-        var d = Math.sqrt(dx*dx+dy*dy);
-        if(d < link){
-          ctx.strokeStyle = "rgba(" + c + "," + (0.14*(1-d/link)).toFixed(3) + ")";
-          ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke();
-        }
-      }
-    }
-    for(var k=0;k<pts.length;k++){
-      ctx.fillStyle = "rgba(" + c + ",0.34)";
-      ctx.beginPath(); ctx.arc(pts[k].x, pts[k].y, pts[k].r, 0, Math.PI*2); ctx.fill();
-    }
-  }
-  function step(){
-    for(var i=0;i<pts.length;i++){
-      var p = pts[i];
-      p.x += p.vx; p.y += p.vy;
-      if(p.x < -20) p.x = W+20; if(p.x > W+20) p.x = -20;
-      if(p.y < -20) p.y = H+20; if(p.y > H+20) p.y = -20;
-    }
-    draw();
-    raf = requestAnimationFrame(step);
-  }
-  function startParticles(){
-    build();
-    if(reduce){ draw(); return; }
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(step);
-  }
-  var rt;
-  window.addEventListener("resize", function(){
-    clearTimeout(rt);
-    rt = setTimeout(startParticles, 200);
-  });
-  document.addEventListener("visibilitychange", function(){
-    if(document.hidden){ cancelAnimationFrame(raf); }
-    else if(!reduce){ raf = requestAnimationFrame(step); }
-  });
-
   /* ---------- 5. 滚动显现 ---------- */
   if("IntersectionObserver" in window){
     var io = new IntersectionObserver(function(entries){
@@ -920,7 +885,6 @@ footer{
 
   /* ---------- 启动 ---------- */
   applyLang("zh");
-  startParticles();
   onScroll();
 })();
 </script>
