@@ -267,6 +267,15 @@ h1{
 .card ul{margin:0 0 16px;padding-left:19px;color:var(--muted)}
 .card ul li{margin-bottom:8px;font-size:15.3px}
 .card ul li::marker{color:var(--accent)}
+.poster-link{
+  display:inline-flex;align-items:center;gap:5px;vertical-align:2px;margin-left:11px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border:1px solid var(--line);border-radius:6px;color:var(--muted);
+  text-decoration:none;font-weight:400;
+  transition:border-color .2s,color .2s,background .2s;
+}
+.poster-link:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+.poster-link svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
 .tag{
   font-family:var(--font-mono);font-size:11.5px;letter-spacing:.04em;
@@ -543,7 +552,7 @@ footer{
     <div class="cards">
       <article class="card reveal">
         <div class="card-head">
-          <h3 class="card-title"><a class="plain" href="age-discrimination-siop2026.pdf" target="_blank" rel="noopener noreferrer" data-zh="职场年龄歧视干预研究" data-en="Reducing Age Discrimination at Work">职场年龄歧视干预研究</a></h3>
+          <h3 class="card-title"><a class="plain" href="age-discrimination-siop2026.pdf" target="_blank" rel="noopener noreferrer" data-zh="职场年龄歧视干预研究" data-en="Reducing Age Discrimination at Work">职场年龄歧视干预研究</a><a class="poster-link" href="siop2026-poster.pdf" target="_blank" rel="noopener noreferrer" title="View conference poster"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="1.5"/><path d="M12 17v4M8.5 21h7M7.5 8.5h9M7.5 12h5"/></svg><span>Poster</span></a></h3>
           <span class="card-meta">2025.09 – 2026.05 · SIOP 2026</span>
         </div>
         <p class="card-role" data-zh="研究成员 · 数据分析与统计建模" data-en="Researcher · Data analysis &amp; statistical modelling">研究成员 · 数据分析与统计建模</p>
@@ -585,7 +594,7 @@ footer{
 
       <article class="card reveal">
         <div class="card-head">
-          <h3 class="card-title"><a class="plain" href="social-entrepreneurship-aaom2025.pdf" target="_blank" rel="noopener noreferrer" data-zh="非西方情境下的社会创业研究" data-en="Social Entrepreneurship Beyond the West">非西方情境下的社会创业研究</a></h3>
+          <h3 class="card-title"><a class="plain" href="social-entrepreneurship-aaom2025.pdf" target="_blank" rel="noopener noreferrer" data-zh="非西方情境下的社会创业研究" data-en="Social Entrepreneurship Beyond the West">非西方情境下的社会创业研究</a><a class="poster-link" href="aaom2025-poster.pdf" target="_blank" rel="noopener noreferrer" title="View conference poster"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="1.5"/><path d="M12 17v4M8.5 21h7M7.5 8.5h9M7.5 12h5"/></svg><span>Poster</span></a></h3>
           <span class="card-meta">2024.09 – 2025.06 · AAOM 2025</span>
         </div>
         <p class="card-role" data-zh="研究助理 · 战略管理" data-en="Research Assistant · Strategic Management">研究助理 · 战略管理</p>
