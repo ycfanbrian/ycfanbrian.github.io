@@ -295,8 +295,12 @@ a.plain,a.plain:link,a.plain:visited,a.plain:hover,a.plain:active,a.plain:focus{
 }
 
 /* ============ INLINE VIDEO ============ */
-.card-video{margin-top:18px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#0A0F12}
-.card-video video{width:100%;display:block;max-height:420px}
+.card-video{
+  margin:18px 0 0;width:fit-content;max-width:100%;
+  border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#0A0F12;
+}
+.card-video video{display:block;max-width:100%;width:auto;height:auto;max-height:min(600px,74vh)}
+@media(max-width:620px){.card-video{width:100%}.card-video video{width:100%}}
 .card-video figcaption{
   font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--muted);
   padding:9px 14px;background:var(--surface);border-top:1px solid var(--line);
@@ -601,9 +605,9 @@ footer{
           <span class="tag">Moderation Analysis</span><span class="tag">Conference Talk</span>
         </div>
         <figure class="card-video">
-          <video controls preload="metadata" playsinline poster="euram2025-talk-cover.jpg">
-            <source src="euram2025-talk.mp4" type="video/mp4">
-            <source src="euram2025-talk.MP4" type="video/mp4">
+          <video controls preload="metadata" playsinline>
+            <source src="euram2025-talk.mp4#t=0.1" type="video/mp4">
+            <source src="euram2025-talk.MP4#t=0.1" type="video/mp4">
             <source src="euram2025-talk.mov" type="video/quicktime">
             <source src="euram2025-talk.MOV" type="video/quicktime">
             <a class="plain" href="euram2025-talk.mp4">下载视频 / Download the clip</a>
