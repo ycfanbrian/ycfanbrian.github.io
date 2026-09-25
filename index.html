@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>范逸臣 Yichen FAN | 市场营销 · 产品 · 商业分析</title>
+<title>Yichen FAN | Marketing · Product · Business Analytics</title>
 <meta name="description" content="Yichen FAN (Brian) — Master of Management (Marketing) at the University of Melbourne. Marketing, product and business analytics. 墨尔本大学管理学硕士在读，市场营销 · 产品经理 · 商业分析。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -947,7 +947,7 @@ footer{
     en:{ title:"Yichen FAN | Marketing · Product · Business Analytics", btn:"中",
          words:["Marketing","Product Management","Business Analytics","Research","Data-Driven"] }
   };
-  var lang = "zh";
+  var lang = "en";
   var langBtn = document.getElementById("langBtn");
 
   function applyLang(l){
@@ -968,10 +968,22 @@ footer{
 
   /* ---------- 2. 深浅色切换 ---------- */
   var themeBtn = document.getElementById("themeBtn");
-  if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){
-    document.documentElement.setAttribute("data-theme","dark");
+  var themeMQ = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  var themeManual = false;
+
+  function followSystem(){
+    if(themeManual) return;
+    var dark = themeMQ && themeMQ.matches;
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   }
+  followSystem();
+  if(themeMQ){
+    if(themeMQ.addEventListener) themeMQ.addEventListener("change", followSystem);
+    else if(themeMQ.addListener) themeMQ.addListener(followSystem);
+  }
+
   themeBtn.addEventListener("click", function(){
+    themeManual = true;
     var cur = document.documentElement.getAttribute("data-theme");
     document.documentElement.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
   });
@@ -1035,7 +1047,7 @@ footer{
   window.addEventListener("scroll", onScroll, { passive:true });
 
   /* ---------- 启动 ---------- */
-  applyLang("zh");
+  applyLang("en");
   onScroll();
 })();
 </script>
