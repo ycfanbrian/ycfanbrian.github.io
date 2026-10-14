@@ -1092,6 +1092,29 @@ footer{
   }
   window.addEventListener("scroll", onScroll, { passive:true });
 
+  /* ---------- 7. 邮箱：点击复制 + mailto 兜底 ---------- */
+  var MAILTXT = { zh:["邮箱已复制","联系我","fyichen3@gmail.com"], en:["Email copied","Get in touch","fyichen3@gmail.com"] };
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="mailto:"]'), function(link){
+    link.addEventListener("click", function(){
+      var addr = link.getAttribute("href").replace("mailto:","");
+      var span = link.querySelector("span") || link;
+      var original = span.textContent;
+      function flash(){
+        span.textContent = (lang === "zh") ? MAILTXT.zh[0] : MAILTXT.en[0];
+        setTimeout(function(){ span.textContent = original; }, 1800);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(addr).then(flash, function(){});
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = addr; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); flash(); } catch(e){}
+        document.body.removeChild(ta);
+      }
+    });
+  });
+
   /* ---------- 启动 ---------- */
   applyLang("en");
   onScroll();
