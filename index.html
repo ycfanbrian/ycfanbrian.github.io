@@ -398,6 +398,120 @@ footer{
   .reveal{opacity:1;transform:none}
 }
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+/* ---- 横向溢出修复：grid/flex item 默认 min-width:auto 会被内部横向滚动条撑宽 ---- */
+@media(max-width:560px){.card-meta{white-space:normal}}
+.card{min-width:0}
+.shots{min-width:0}
+.acc-body,.acc-body .card{min-width:0}
+
+/* ============ LANYARD (hero) ============ */
+.lanyard{position:relative;width:clamp(320px,46vw,560px);height:clamp(430px,70vh,620px);
+  touch-action:none;user-select:none;-webkit-user-select:none}
+.lny-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.lny-strap{fill:none;stroke:#2E6AC4;stroke-width:19;stroke-linejoin:round;stroke-linecap:round}
+.lny-strap-edge{fill:none;stroke:#1C4A90;stroke-width:19;stroke-linejoin:round;stroke-linecap:round;opacity:.35}
+.lny-strap-gloss{fill:none;stroke:#fff;stroke-width:3;stroke-linejoin:round;stroke-linecap:round;opacity:.24}
+.lny-strap-text{font:700 9px/1 var(--font-body);letter-spacing:.22em;fill:#fff;opacity:.85}
+.lny-anchor{fill:var(--muted);opacity:.55}
+.lny-card{position:absolute;left:0;top:0;width:clamp(230px,28vw,390px);transform-origin:50% 0;
+  will-change:transform;cursor:grab}
+.lny-card:active{cursor:grabbing}
+.lny-clip{position:absolute;left:50%;top:-13px;width:44px;height:21px;margin-left:-22px;
+  border-radius:4px 4px 2px 2px;z-index:3;
+  background:linear-gradient(#f2f5f9,#c3ccd8 48%,#9aa6b5 52%,#e6ebf1);
+  box-shadow:0 1px 2px rgba(10,20,35,.28);border:1px solid #93a0b0}
+.lny-clip::after{content:"";position:absolute;left:50%;top:5px;width:17px;height:9px;margin-left:-8.5px;
+  border-radius:2px;background:rgba(40,55,75,.3)}
+.lny-face{position:relative;border-radius:14px;overflow:hidden;background:var(--surface);
+  border:1px solid var(--line);
+  box-shadow:0 22px 44px -18px rgba(14,30,55,.42),0 2px 6px rgba(14,30,55,.12)}
+.lny-face img{display:block;width:100%;height:auto}
+.lny-hole{position:absolute;left:50%;top:8px;width:32px;height:7px;margin-left:-16px;border-radius:4px;
+  background:rgba(12,22,38,.4);box-shadow:inset 0 1px 1px rgba(0,0,0,.35);z-index:2}
+@media (prefers-reduced-motion: reduce){.lny-card{cursor:default}}
+
+/* ============ SPIRAL (timeline) ============ */
+.spiral{position:relative;height:clamp(300px,42vh,400px);margin:10px 0 40px;
+  overflow:hidden;
+  perspective:1150px;perspective-origin:50% 50%;
+  touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
+.spiral:active{cursor:grabbing}
+.spiral-ring{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
+.sp-card{position:absolute;width:190px;left:-95px;top:-56px;
+  transform-style:preserve-3d;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  will-change:transform,opacity}
+.sp-face{border-radius:12px;background:var(--surface);border:1px solid var(--line);
+  padding:13px 15px 15px;box-shadow:0 14px 30px -14px rgba(23,36,43,.34)}
+.sp-date{font:700 11px/1 var(--font-mono);letter-spacing:.1em;color:var(--accent);margin-bottom:7px}
+.sp-text{margin:0;font-size:12.5px;line-height:1.5;color:var(--muted);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.spiral-hint{position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);
+  font-size:11.5px;color:var(--muted);opacity:.65;pointer-events:none}
+@media (max-width:760px){.spiral{height:264px}.sp-card{width:160px;left:-80px}}
+@media (prefers-reduced-motion: reduce){.spiral{cursor:default}.spiral-hint{display:none}}
+
+/* ============ EDUCATION CAROUSEL ============ */
+.fxc{position:relative}
+.fxc-view{overflow:hidden;padding:8px 0 2px;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.fxc-track{display:flex;align-items:stretch;will-change:transform;
+  transition:transform .62s cubic-bezier(.22,.9,.26,1)}
+.fxc-slide{flex:0 0 auto;padding:0 9px}
+.fxc-card{height:100%;background:var(--surface);border:1px solid var(--line);border-radius:16px;
+  padding:26px 28px;box-shadow:var(--shadow);
+  transition:opacity .5s ease,transform .5s cubic-bezier(.22,.9,.26,1),border-color .3s}
+.fxc-slide.is-off .fxc-card{opacity:.32;transform:scale(.93)}
+.fxc-card .edu-item{display:block;padding:0;border-bottom:0}
+.fxc-card .edu-when{margin-top:14px;display:inline-block;padding:4px 10px;border-radius:99px;
+  background:var(--accent-soft);color:var(--accent);font:600 12px/1.4 var(--font-mono)}
+.fxc-nav{display:flex;align-items:center;gap:8px;margin:16px 0 4px}
+.fxc-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);
+  color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:border-color .2s,transform .2s,opacity .2s;padding:0}
+.fxc-btn:hover{border-color:var(--accent);transform:translateY(-1px)}
+.fxc-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.fxc-dots{display:flex;gap:7px;margin-left:auto;align-items:center}
+.fxc-dot{width:7px;height:7px;padding:0;border:0;border-radius:99px;background:var(--line);
+  cursor:pointer;transition:width .3s,background .3s}
+.fxc-dot.is-on{width:22px;background:var(--accent)}
+@media (prefers-reduced-motion: reduce){.fxc-track{transition:none}.fxc-card{transition:none}}
+
+/* ============ WORK ACCORDION ============ */
+.acc{display:flex;gap:12px;align-items:stretch;height:clamp(380px,52vh,560px)}
+.acc.no-anim .acc-panel,.acc.no-anim .acc-body{transition:none}
+.acc-panel{position:relative;min-width:0;flex:0 0 68px;border-radius:16px;
+  transition:flex-basis .6s cubic-bezier(.22,.9,.26,1),flex-grow .6s cubic-bezier(.22,.9,.26,1)}
+.acc-panel.is-open{flex:1 1 auto}
+.acc-spine{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;cursor:pointer;
+  transition:opacity .35s ease,border-color .25s,background .25s;padding:0}
+.acc-spine:hover{border-color:var(--accent)}
+.acc-spine span{writing-mode:vertical-rl;text-orientation:mixed;white-space:nowrap;
+  font:600 14px/1 var(--font-display);letter-spacing:.03em;color:var(--ink);
+  max-height:84%;overflow:hidden}
+.acc-panel.is-open .acc-spine{opacity:0;pointer-events:none}
+.acc-body{height:100%;opacity:0;transition:opacity .38s ease .16s}
+.acc-panel.is-open .acc-body{opacity:1}
+.acc-panel:not(.is-open) .acc-body{visibility:hidden}
+.acc-body .card{height:100%;overflow-y:auto;overscroll-behavior:contain}
+.acc-body .card:hover{transform:none}
+@media (max-width:860px){
+  .acc{display:block;height:auto}
+  .acc-panel{flex:none;margin-bottom:12px}
+  .acc-spine{position:static;justify-content:flex-start;padding:17px 20px;width:100%;text-align:left}
+  .acc-spine span{writing-mode:horizontal-tb;max-height:none;white-space:normal}
+  .acc-panel.is-open .acc-spine{display:none}
+  .acc-body{height:auto}
+  .acc-panel:not(.is-open) .acc-body{display:none}
+  .acc-body .card{overflow:visible}
+}
+@media (prefers-reduced-motion: reduce){.acc-panel{transition:none}.acc-body{transition:none}}
+
 </style>
 </head>
 
@@ -470,7 +584,23 @@ footer{
       </div>
 
       <div class="avatar-col">
-        <figure class="hero-photo"><img src="photo.jpg" alt="Yichen FAN 范逸臣"></figure>
+        <div class="lanyard" id="lanyard">
+          <svg class="lny-svg" id="lnySvg" aria-hidden="true">
+            <defs><path id="lnyTextPath" d=""/></defs>
+            <circle class="lny-anchor" id="lnyAnchor" r="4"/>
+            <path class="lny-strap-edge" id="lnyEdge" d=""/>
+            <path class="lny-strap" id="lnyStrap" d=""/>
+            <path class="lny-strap-gloss" id="lnyGloss" d=""/>
+            <text class="lny-strap-text"><textPath href="#lnyTextPath" startOffset="8">YICHEN FAN &#183; YICHEN FAN &#183; YICHEN FAN &#183; YICHEN FAN &#183; YICHEN FAN &#183; YICHEN FAN</textPath></text>
+          </svg>
+          <div class="lny-card" id="lnyCard">
+            <div class="lny-clip"></div>
+            <div class="lny-face">
+              <div class="lny-hole"></div>
+              <img id="lnyImg" src="photo.jpg" alt="Yichen FAN 范逸臣">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -532,6 +662,11 @@ footer{
   <div class="wrap">
     <p class="eyebrow reveal" data-zh="个人动态" data-en="Timeline">个人动态</p>
     <h2 class="sec-title reveal" data-zh="最近发生了什么" data-en="What I've been up to">最近发生了什么</h2>
+
+    <div class="spiral" id="spiral" aria-hidden="true">
+      <div class="spiral-ring" id="spiralRing"></div>
+      <span class="spiral-hint" data-zh="拖动可旋转" data-en="Drag to spin">拖动可旋转</span>
+    </div>
 
     <ul class="timeline">
       <li class="tl-item reveal">
@@ -992,6 +1127,454 @@ footer{
 </footer>
 
 <script>
+/* ============================================================
+   渐进增强：挂绳卡片 / 螺旋时间线 / 教育轮播 / 经历手风琴
+   每一块都是在既有文字节点上就地改造，脚本失效时页面退回原排版。
+   必须跑在主脚本之前，这样新生成的 data-zh 节点能被 applyLang 接管。
+   ============================================================ */
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- 1. 首页挂绳卡片 ---------- */
+  try{
+  (function(){
+    var stage = document.getElementById("lanyard");
+    if (!stage) return;
+    var svg   = document.getElementById("lnySvg"),
+        card  = document.getElementById("lnyCard"),
+        strap = document.getElementById("lnyStrap"),
+        edge  = document.getElementById("lnyEdge"),
+        gloss = document.getElementById("lnyGloss"),
+        tpath = document.getElementById("lnyTextPath"),
+        dot   = document.getElementById("lnyAnchor"),
+        img   = document.getElementById("lnyImg");
+    if (!svg || !card || !strap) return;
+
+    var N = 16, DAMP = 0.978, G = 1750, ITER = 12, DT = 1/60;
+    var pts = [], anchor = {x:0,y:4}, seg = 14, rest = 0;
+    var stageW = 0, halfCard = 0, cardH = 0;
+    var dragging = false, dragDX = 0, dragDY = 0, dragX = 0, dragY = 0;
+    var t = 0, seeded = false, running = false;
+
+    function measure(){
+      var w = stage.clientWidth, h = stage.clientHeight;
+      if (!w || !h) return false;
+      var cw = card.offsetWidth || 0, ch = card.offsetHeight || 0;
+      if (!cw || !ch) return false;
+      var oldRest = rest, oldAX = anchor.x;
+      stageW = w; halfCard = cw / 2; cardH = ch;
+      svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+      anchor.x = Math.round(w / 2);
+      rest = Math.max(90, h - ch - 24);
+      seg  = rest / (N - 1);
+      dot.setAttribute("cx", anchor.x); dot.setAttribute("cy", anchor.y);
+      if (seeded && oldRest > 0){
+        var k = rest / oldRest, dAX = anchor.x - oldAX;
+        for (var i = 0; i < N; i++){
+          var p = pts[i];
+          p.x += dAX; p.px += dAX;
+          p.y  = anchor.y + (p.y  - anchor.y) * k;
+          p.py = anchor.y + (p.py - anchor.y) * k;
+        }
+        constrain();
+      }
+      return true;
+    }
+    function seed(kick){
+      pts.length = 0;
+      for (var i = 0; i < N; i++){
+        var x = anchor.x + kick * (i / (N - 1)), y = anchor.y + seg * i;
+        pts.push({x:x, y:y, px:x, py:y});
+      }
+      seeded = true;
+    }
+    function clampEnd(){
+      var L = pts[N-1];
+      var slack = Math.max(0, stageW / 2 - halfCard - 4);
+      var pad = Math.min(cardH * 0.18, slack * 0.72);
+      var lo = halfCard + 4 + pad, hi = stageW - halfCard - 4 - pad;
+      if (hi < lo) L.x = stageW / 2;
+      else if (L.x < lo) L.x = lo;
+      else if (L.x > hi) L.x = hi;
+    }
+    function constrain(){
+      for (var k = 0; k < ITER; k++){
+        pts[0].x = anchor.x; pts[0].y = anchor.y;
+        pts[0].px = anchor.x; pts[0].py = anchor.y;
+        for (var i = 0; i < N - 1; i++){
+          var a = pts[i], b = pts[i+1];
+          var dx = b.x - a.x, dy = b.y - a.y;
+          var d = Math.sqrt(dx*dx + dy*dy) || 1e-4;
+          var diff = (d - seg) / d;
+          if (i === 0){ b.x -= dx*diff; b.y -= dy*diff; }
+          else { a.x += dx*diff*0.5; a.y += dy*diff*0.5; b.x -= dx*diff*0.5; b.y -= dy*diff*0.5; }
+        }
+        if (dragging){ pts[N-1].x = dragX; pts[N-1].y = dragY; }
+        clampEnd();
+      }
+      pts[0].x = anchor.x; pts[0].y = anchor.y;
+    }
+    function physics(){
+      var breeze = Math.sin(t * 0.55) * 6 + Math.sin(t * 1.31) * 2.5;
+      for (var i = 1; i < N; i++){
+        var p = pts[i];
+        var vx = (p.x - p.px) * DAMP, vy = (p.y - p.py) * DAMP;
+        p.px = p.x; p.py = p.y;
+        var g = (i === N - 1) ? G * 2.1 : G;
+        p.x += vx + breeze * DT * DT * (i / N);
+        p.y += vy + g * DT * DT;
+      }
+      if (dragging){
+        var L = pts[N-1];
+        L.x = dragX; L.y = dragY;
+        L.px += (L.x - L.px) * 0.42;
+        L.py += (L.y - L.py) * 0.42;
+      }
+      constrain();
+    }
+    function path(){
+      var d = "M" + pts[0].x.toFixed(2) + " " + pts[0].y.toFixed(2);
+      for (var i = 1; i < N - 1; i++){
+        var mx = (pts[i].x + pts[i+1].x) / 2, my = (pts[i].y + pts[i+1].y) / 2;
+        d += " Q" + pts[i].x.toFixed(2) + " " + pts[i].y.toFixed(2) + " " + mx.toFixed(2) + " " + my.toFixed(2);
+      }
+      return d + " L" + pts[N-1].x.toFixed(2) + " " + pts[N-1].y.toFixed(2);
+    }
+    function draw(){
+      var d = path();
+      strap.setAttribute("d", d); edge.setAttribute("d", d);
+      gloss.setAttribute("d", d); tpath.setAttribute("d", d);
+      var a = pts[N-2], b = pts[N-1];
+      var ang = Math.atan2(-(b.x - a.x), (b.y - a.y)) * 180 / Math.PI;
+      card.style.transform = "translate(" + (b.x - halfCard).toFixed(2) + "px," + b.y.toFixed(2) +
+                             "px) rotate(" + ang.toFixed(2) + "deg)";
+    }
+    function frame(){
+      if (!reduce){ t += DT; physics(); }
+      draw();
+      if (!reduce) requestAnimationFrame(frame);
+    }
+    function boot(){
+      if (!measure()) return false;
+      if (!seeded){ seed(reduce ? 0 : 34); constrain(); }
+      draw();
+      if (!running && !reduce){ running = true; requestAnimationFrame(frame); }
+      return true;
+    }
+
+    card.addEventListener("pointerdown", function(e){
+      if (reduce || !seeded) return;
+      var r = stage.getBoundingClientRect(), L = pts[N-1];
+      dragDX = (e.clientX - r.left) - L.x;
+      dragDY = (e.clientY - r.top)  - L.y;
+      dragX = L.x; dragY = L.y; dragging = true;
+      if (card.setPointerCapture) card.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    card.addEventListener("pointermove", function(e){
+      if (!dragging) return;
+      var r = stage.getBoundingClientRect();
+      dragX = (e.clientX - r.left) - dragDX;
+      dragY = (e.clientY - r.top)  - dragDY;
+      var maxR = rest * 1.12, dx = dragX - anchor.x, dy = dragY - anchor.y;
+      var d = Math.sqrt(dx*dx + dy*dy);
+      if (d > maxR){ dragX = anchor.x + dx/d*maxR; dragY = anchor.y + dy/d*maxR; }
+      if (dragY < anchor.y + 30) dragY = anchor.y + 30;
+    });
+    function release(){ dragging = false; }
+    card.addEventListener("pointerup", release);
+    card.addEventListener("pointercancel", release);
+    window.addEventListener("blur", release);
+    window.addEventListener("resize", function(){ if (seeded) measure(); else boot(); });
+    if (window.ResizeObserver){
+      new ResizeObserver(function(){ if (seeded) measure(); else boot(); }).observe(stage);
+    }
+    if (img){
+      if (img.complete && img.naturalWidth) boot();
+      img.addEventListener("load", function(){ if (!boot()) setTimeout(boot, 60); });
+    }
+    boot();
+    setTimeout(boot, 150);
+    setTimeout(boot, 700);
+  })();
+  }catch(e){}
+
+  /* ---------- 2. 螺旋时间线（由下方列表生成，内容只有一份来源） ---------- */
+  try{
+  (function(){
+    var stage = document.getElementById("spiral"),
+        ring  = document.getElementById("spiralRing"),
+        list  = document.querySelector("#timeline .timeline");
+    if (!stage || !ring || !list) return;
+    var rows = list.querySelectorAll(".tl-item");
+    if (rows.length < 4){ stage.style.display = "none"; return; }
+
+    var cards = [];
+    for (var i = 0; i < rows.length; i++){
+      var dEl = rows[i].querySelector(".tl-date"), tEl = rows[i].querySelector(".tl-text");
+      if (!dEl || !tEl) continue;
+      var c = document.createElement("div"); c.className = "sp-card";
+      var f = document.createElement("div"); f.className = "sp-face";
+      var d = document.createElement("div"); d.className = "sp-date"; d.textContent = dEl.textContent;
+      var p = document.createElement("p");   p.className = "sp-text";
+      p.setAttribute("data-zh", tEl.getAttribute("data-zh") || tEl.textContent);
+      p.setAttribute("data-en", tEl.getAttribute("data-en") || tEl.textContent);
+      p.textContent = tEl.textContent;
+      f.appendChild(d); f.appendChild(p); c.appendChild(f);
+      ring.appendChild(c); cards.push(c);
+    }
+    var n = cards.length;
+    if (!n){ stage.style.display = "none"; return; }
+
+    var TURNS = 1.5, R = 270, SPAN = 200, SPEED = 0.16;
+    var base = 0, vel = 0, dragging = false, lastX = 0, visible = true, raf = 0;
+    var step = Math.PI * 2 * TURNS / n;
+
+    function sizes(){
+      var w = stage.clientWidth || 800;
+      R    = Math.max(158, Math.min(280, w * 0.32));
+      SPAN = Math.max(130, Math.min(200, stage.clientHeight - 170));
+    }
+    function render(){
+      for (var i = 0; i < n; i++){
+        var th = base + i * step;
+        var y  = (i / (n - 1) - 0.5) * SPAN;
+        var front = Math.cos(th);
+        var c = cards[i];
+        c.style.transform = "rotateY(" + (th * 180 / Math.PI).toFixed(2) + "deg) translateZ(" +
+          R.toFixed(1) + "px) translateY(" + y.toFixed(1) + "px) scale(" +
+          (0.86 + 0.14 * (0.5 + 0.5 * front)).toFixed(3) + ")";
+        c.style.opacity = (0.16 + 0.84 * (0.5 + 0.5 * front)).toFixed(3);
+        c.style.zIndex  = String(1000 + Math.round(front * 500));
+      }
+    }
+    function frame(){
+      raf = 0;
+      if (!dragging){
+        base += (SPEED + vel) * (1/60);
+        vel *= 0.94;
+        if (Math.abs(vel) < 0.0004) vel = 0;
+      }
+      render();
+      if (visible && !reduce) raf = requestAnimationFrame(frame);
+    }
+    function kick(){ if (!raf && visible && !reduce) raf = requestAnimationFrame(frame); }
+
+    stage.addEventListener("pointerdown", function(e){
+      if (reduce) return;
+      dragging = true; lastX = e.clientX; vel = 0;
+      if (stage.setPointerCapture) stage.setPointerCapture(e.pointerId);
+    });
+    stage.addEventListener("pointermove", function(e){
+      if (!dragging) return;
+      var dx = e.clientX - lastX; lastX = e.clientX;
+      base += dx * 0.006; vel = dx * 0.26;
+      render();
+    });
+    function up(){ if (dragging){ dragging = false; kick(); } }
+    stage.addEventListener("pointerup", up);
+    stage.addEventListener("pointercancel", up);
+    window.addEventListener("resize", function(){ sizes(); render(); });
+    if (window.IntersectionObserver){
+      new IntersectionObserver(function(es){
+        visible = es[0].isIntersecting;
+        if (visible) kick(); else if (raf){ cancelAnimationFrame(raf); raf = 0; }
+      }, {rootMargin:"120px"}).observe(stage);
+    }
+    sizes(); render(); if (!reduce) kick();
+  })();
+  }catch(e){}
+
+  /* ---------- 3. 教育经历轮播 ---------- */
+  try{
+  (function(){
+    var sec = document.getElementById("education");
+    if (!sec) return;
+    var items = sec.querySelectorAll(".edu-item");
+    if (items.length < 2) return;
+    var host = items[0].parentNode;
+
+    var fxc   = document.createElement("div"); fxc.className = "fxc";
+    var view  = document.createElement("div"); view.className = "fxc-view";
+    var track = document.createElement("div"); track.className = "fxc-track";
+    view.appendChild(track); fxc.appendChild(view);
+
+    var slides = [];
+    for (var i = 0; i < items.length; i++){
+      var s = document.createElement("div"); s.className = "fxc-slide";
+      var cd = document.createElement("div"); cd.className = "fxc-card";
+      cd.appendChild(items[i]);               // 搬移原节点，内容不复制
+      s.appendChild(cd); track.appendChild(s); slides.push(s);
+    }
+
+    var nav = document.createElement("div"); nav.className = "fxc-nav";
+    function arrow(dir, label){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "fxc-btn"; b.setAttribute("aria-label", label);
+      b.innerHTML = '<svg viewBox="0 0 24 24"><path d="' +
+        (dir < 0 ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7") + '"/></svg>';
+      return b;
+    }
+    var prev = arrow(-1, "Previous"), next = arrow(1, "Next");
+    var dots = document.createElement("div"); dots.className = "fxc-dots";
+    nav.appendChild(prev); nav.appendChild(next); nav.appendChild(dots);
+    fxc.appendChild(nav);
+
+    var hon = sec.querySelector(".honours");
+    if (hon && hon.parentNode === host) host.insertBefore(fxc, hon);
+    else host.appendChild(fxc);
+
+    var idx = 0, dotEls = [];
+    for (var j = 0; j < slides.length; j++){
+      (function(k){
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "fxc-dot";
+        b.setAttribute("aria-label", "Slide " + (k + 1));
+        b.addEventListener("click", function(){ go(k); });
+        dots.appendChild(b); dotEls.push(b);
+      })(j);
+    }
+
+    function slideW(){
+      var vw = view.clientWidth || 600;
+      return vw >= 820 ? Math.round(vw * 0.62) : Math.round(vw * (vw >= 560 ? 0.80 : 0.94));
+    }
+    function layout(){
+      var w = slideW(), vw = view.clientWidth || 600;
+      for (var i = 0; i < slides.length; i++) slides[i].style.flexBasis = w + "px";
+      track.style.transform = "translateX(" + (-(idx * w) + Math.round((vw - w) / 2)) + "px)";
+    }
+    function paint(){
+      for (var i = 0; i < slides.length; i++){
+        slides[i].classList.toggle("is-off", i !== idx);
+        slides[i].setAttribute("aria-hidden", i !== idx ? "true" : "false");
+        dotEls[i].classList.toggle("is-on", i === idx);
+      }
+      prev.style.opacity = idx === 0 ? ".4" : "";
+      next.style.opacity = idx === slides.length - 1 ? ".4" : "";
+    }
+    function go(i){
+      idx = Math.max(0, Math.min(slides.length - 1, i));
+      layout(); paint();
+    }
+    prev.addEventListener("click", function(){ go(idx - 1); });
+    next.addEventListener("click", function(){ go(idx + 1); });
+
+    var sx = 0, sdrag = false;
+    view.addEventListener("pointerdown", function(e){ sdrag = true; sx = e.clientX; });
+    view.addEventListener("pointerup", function(e){
+      if (!sdrag) return;
+      sdrag = false;
+      var dx = e.clientX - sx;
+      if (Math.abs(dx) > 44) go(idx + (dx < 0 ? 1 : -1));
+    });
+    view.addEventListener("pointercancel", function(){ sdrag = false; });
+    window.addEventListener("resize", layout);
+
+    go(0);
+    setTimeout(layout, 120);
+  })();
+  }catch(e){}
+
+  /* ---------- 4. 职业经历手风琴 ---------- */
+  try{
+  (function(){
+    var sec = document.getElementById("experience");
+    if (!sec) return;
+    var host = sec.querySelector(".cards");
+    if (!host) return;
+    var cards = host.querySelectorAll(".card");
+    if (cards.length < 2) return;
+
+    var frag = document.createDocumentFragment(), panels = [];
+    for (var i = 0; i < cards.length; i++){
+      var card = cards[i];
+      var title = card.querySelector(".card-title");
+      if (!title) return;                      // 结构不符就整体放弃，保留原排版
+      card.classList.remove("reveal", "in");   // 交给手风琴自己做出场
+
+      var panel = document.createElement("div"); panel.className = "acc-panel";
+      var spine = document.createElement("button");
+      spine.type = "button"; spine.className = "acc-spine";
+      var sp = document.createElement("span");
+      sp.setAttribute("data-zh", title.getAttribute("data-zh") || title.textContent);
+      sp.setAttribute("data-en", title.getAttribute("data-en") || title.textContent);
+      sp.textContent = title.textContent;
+      spine.appendChild(sp);
+      var body = document.createElement("div"); body.className = "acc-body";
+      body.appendChild(card);
+      panel.appendChild(spine); panel.appendChild(body);
+      frag.appendChild(panel); panels.push(panel);
+    }
+
+    host.innerHTML = "";
+    host.appendChild(frag);
+    host.classList.add("acc", "reveal");
+
+    function open(i){
+      for (var k = 0; k < panels.length; k++){
+        var on = (k === i);
+        panels[k].classList.toggle("is-open", on);
+        panels[k].querySelector(".acc-spine").setAttribute("aria-expanded", on ? "true" : "false");
+      }
+    }
+    for (var j = 0; j < panels.length; j++){
+      (function(k){
+        panels[k].querySelector(".acc-spine").addEventListener("click", function(){ open(k); });
+      })(j);
+    }
+    /* 容器高度取四张卡片里最高的那张，避免展开后底部大片留白 */
+    function fit(){
+      if (window.innerWidth <= 860){ host.style.height = ""; return; }
+      var was = [], i;
+      for (i = 0; i < panels.length; i++) was.push(panels[i].classList.contains("is-open"));
+      host.classList.add("no-anim");
+      host.style.height = "";
+      var max = 0;
+      for (i = 0; i < panels.length; i++){
+        open(i);
+        var c = panels[i].querySelector(".card");
+        if (c) max = Math.max(max, c.scrollHeight);
+      }
+      for (i = 0; i < panels.length; i++) panels[i].classList.toggle("is-open", was[i]);
+      if (max > 0) host.style.height = Math.ceil(max + 2) + "px";
+      void host.offsetHeight;
+      host.classList.remove("no-anim");
+    }
+
+    open(0);
+    fit();
+    var ft = 0;
+    window.addEventListener("resize", function(){ clearTimeout(ft); ft = setTimeout(fit, 150); });
+    var lb = document.getElementById("langBtn");
+    if (lb) lb.addEventListener("click", function(){ setTimeout(fit, 60); });
+    setTimeout(fit, 400);
+    window.addEventListener("load", function(){ setTimeout(fit, 120); });
+  })();
+  }catch(e){}
+
+  /* ---------- 5. 版面高度被手风琴/轮播改变后，催一次既有的 reveal 扫描 ---------- */
+  try{
+  (function(){
+    function nudge(){
+      try{ window.dispatchEvent(new Event("scroll")); }catch(e){}
+    }
+    var ms = [140, 420, 900, 1800, 3200];
+    for (var i = 0; i < ms.length; i++) setTimeout(nudge, ms[i]);
+    if (window.ResizeObserver){
+      var tid = 0;
+      new ResizeObserver(function(){
+        clearTimeout(tid); tid = setTimeout(nudge, 120);
+      }).observe(document.body);
+    }
+    window.addEventListener("load", nudge);
+  })();
+  }catch(e){}
+})();
+</script>
+
+<script>
 (function(){
   "use strict";
 
@@ -1255,7 +1838,7 @@ footer{
   }
 
   /* ---------- 职业经历：卡片上浮 + 要点依次进入 + 标签弹出 ---------- */
-  Array.prototype.forEach.call(document.querySelectorAll("#experience .card"), function(card){
+  Array.prototype.forEach.call(document.querySelectorAll("#experience .cards:not(.acc) .card"), function(card){
     var role    = card.querySelector(".card-role");
     var bullets = card.querySelectorAll("ul li");
     var tags    = card.querySelectorAll(".tag");
