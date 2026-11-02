@@ -1142,16 +1142,19 @@ footer{
 </script>
 
 <script type="module">
-/* 滚动动效（anime.js v4）。滚动只负责触发，动画独立播完，
-   快速滚动也不会卡在半透明。三重降级：偏好减少动效、库加载失败、
-   动画未触发或未跑完时，内容都会正常显示。 */
+/* 滚动动效（anime.js v4.5.0，自托管于本仓库）。滚动只负责触发，
+   动画独立播完，快速滚动也不会卡在半透明。三重降级：偏好减少动效、
+   库加载失败、动画未触发或未跑完时，内容都会正常显示。 */
 (async function(){
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   var lib;
   try {
-    lib = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/anime.esm.min.js");
-  } catch (err) { return; }
+    lib = await import("./anime.esm.min.js");          /* 同源自托管，anime.js v4.5.0 */
+  } catch (err) {
+    try { lib = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.esm.min.js"); }
+    catch (err2) { return; }
+  }
 
   var createTimeline = lib.createTimeline, onScroll = lib.onScroll,
       stagger = lib.stagger, utils = lib.utils;
