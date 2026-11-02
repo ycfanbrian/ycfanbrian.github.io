@@ -256,6 +256,15 @@ h1{
   }
 }
 
+/* ============ MOTION HOOKS (anime.js) ============ */
+.timeline::before{transform:scaleY(var(--tl-draw,1));transform-origin:top center}
+.tl-item .tl-body::before{opacity:var(--tl-dot-o,1);transform:scale(var(--tl-dot,1))}
+.timeline.is-animating .tl-body::before,
+.timeline.is-animating .tl-item::before{transition:none}
+@media(max-width:700px){
+  .tl-item::before{opacity:var(--tl-dot-o,1);transform:scale(var(--tl-dot,1))}
+}
+
 /* ============ CARDS ============ */
 .cards{display:grid;gap:20px}
 .card{
@@ -1082,8 +1091,19 @@ footer{
   var links = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
   var secs = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
 
+  var revealLeft = 1;
+  function sweepReveal(){
+    if (!revealLeft) return;
+    var pend = document.querySelectorAll(".reveal:not(.in)");
+    revealLeft = pend.length;
+    for (var k = 0; k < pend.length; k++){
+      if (pend[k].getBoundingClientRect().top < window.innerHeight) pend[k].classList.add("in");
+    }
+  }
+
   function onScroll(){
     header.classList.toggle("scrolled", window.scrollY > 24);
+    sweepReveal();
     var pos = window.scrollY + 140, current = -1;
     for(var i=0;i<secs.length;i++){
       if(secs[i] && secs[i].offsetTop <= pos) current = i;
@@ -1118,6 +1138,145 @@ footer{
   /* ---------- 启动 ---------- */
   applyLang("en");
   onScroll();
+})();
+</script>
+
+<script type="module">
+/* 滚动动效（anime.js v4）。滚动只负责触发，动画独立播完，
+   快速滚动也不会卡在半透明。三重降级：偏好减少动效、库加载失败、
+   动画未触发或未跑完时，内容都会正常显示。 */
+(async function(){
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  var lib;
+  try {
+    lib = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/anime.esm.min.js");
+  } catch (err) { return; }
+
+  var createTimeline = lib.createTimeline, onScroll = lib.onScroll,
+      stagger = lib.stagger, utils = lib.utils;
+
+  var groups = [];
+
+  function toArray(x){
+    if (!x) return [];
+    return Array.prototype.slice.call(x.length !== undefined && !x.nodeType ? x : [x]);
+  }
+  function takeOver(nodes){
+    toArray(nodes).forEach(function(el){
+      el.classList.remove("reveal", "in");
+      el.style.transitionDelay = "";
+    });
+  }
+  function clearInline(nodes, vars){
+    toArray(nodes).forEach(function(el){
+      el.style.opacity = ""; el.style.transform = "";
+      (vars || []).forEach(function(v){ el.style.removeProperty(v); });
+    });
+  }
+
+  /* 触发器：进入视口播一次，动画此后独立运行 */
+  function trigger(target, timeline, group){
+    var played = false;
+    onScroll({
+      target: target, repeat: false,
+      enter: { target: "top", container: "bottom-=70" },
+      onEnter: function(){
+        if (played) return;
+        played = true; group.started = true; timeline.play();
+      }
+    });
+  }
+
+  /* 安全网：已在视口内却仍未显示完全的元素，直接恢复 */
+  function startWatchdog(){
+    if (!groups.length) return;
+    var t0 = Date.now();
+    var id = setInterval(function(){
+      var pending = 0;
+      groups.forEach(function(g){
+        if (g.done) return;
+        pending++;
+        var r = g.probe.getBoundingClientRect();
+        var inView = r.top < (window.innerHeight || 0) * 0.95 && r.bottom > 0;
+        if (!inView) return;
+        var stalled = parseFloat(getComputedStyle(g.probe).opacity) < 0.99;
+        if (stalled && (!g.started || Date.now() - t0 > 4000)) { g.reveal(); g.done = true; }
+      });
+      if (!pending || Date.now() - t0 > 90000) clearInterval(id);
+    }, 700);
+  }
+
+  /* ---------- 时间线：竖线绘制 + 日期滑入 + 节点弹出 ---------- */
+  var tlRoot = document.querySelector(".timeline");
+  if (tlRoot) {
+    var items  = tlRoot.querySelectorAll(".tl-item");
+    var dates  = tlRoot.querySelectorAll(".tl-date");
+    var bodies = tlRoot.querySelectorAll(".tl-body");
+
+    takeOver(items);
+    tlRoot.classList.add("is-animating");
+    utils.set(tlRoot, { "--tl-draw": 0 });
+    utils.set(items,  { "--tl-dot": 0, "--tl-dot-o": 0 });
+    utils.set(dates,  { opacity: 0, x: -14 });
+    utils.set(bodies, { opacity: 0, x: 12 });
+
+    var tlGroup = { probe: dates[0] || tlRoot, started: false, done: false };
+    tlGroup.reveal = function(){
+      tlRoot.classList.remove("is-animating");
+      tlRoot.style.removeProperty("--tl-draw");
+      clearInline(items, ["--tl-dot", "--tl-dot-o"]);
+      clearInline(dates); clearInline(bodies);
+      tlGroup.done = true;
+    };
+    groups.push(tlGroup);
+
+    var tlAnim = createTimeline({ autoplay: false, onComplete: tlGroup.reveal })
+      .add(tlRoot, { "--tl-draw": [0, 1], duration: 1200, ease: "outQuad" }, 0)
+      .add(dates,  { opacity: [0, 1], x: [-14, 0], duration: 540, ease: "outQuad",
+                     delay: stagger(68) }, 160)
+      .add(bodies, { opacity: [0, 1], x: [12, 0], duration: 580, ease: "outQuad",
+                     delay: stagger(68) }, 190)
+      .add(items,  { "--tl-dot-o": [0, 1], duration: 260, ease: "outQuad",
+                     delay: stagger(68) }, 200)
+      .add(items,  { "--tl-dot": [0, 1], duration: 520, ease: "outBack(2.2)",
+                     delay: stagger(68) }, 200);
+
+    trigger(tlRoot, tlAnim, tlGroup);
+  }
+
+  /* ---------- 职业经历：卡片上浮 + 要点依次进入 + 标签弹出 ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll("#experience .card"), function(card){
+    var role    = card.querySelector(".card-role");
+    var bullets = card.querySelectorAll("ul li");
+    var tags    = card.querySelectorAll(".tag");
+
+    takeOver(card);
+    utils.set(card,    { opacity: 0, y: 30 });
+    if (role) utils.set(role, { opacity: 0 });
+    utils.set(bullets, { opacity: 0, x: -10 });
+    utils.set(tags,    { opacity: 0, scale: 0.82 });
+
+    var g = { probe: card, started: false, done: false };
+    g.reveal = function(){
+      clearInline(card); clearInline(role);
+      clearInline(bullets); clearInline(tags);
+      g.done = true;
+    };
+    groups.push(g);
+
+    var anim = createTimeline({ autoplay: false, onComplete: g.reveal })
+      .add(card,    { opacity: [0, 1], y: [30, 0], duration: 640, ease: "outQuad" }, 0)
+      .add(bullets, { opacity: [0, 1], x: [-10, 0], duration: 460, ease: "outQuad",
+                      delay: stagger(62) }, 240)
+      .add(tags,    { opacity: [0, 1], scale: [0.82, 1], duration: 440,
+                      ease: "outBack(2.4)", delay: stagger(48) }, 400);
+    if (role) anim.add(role, { opacity: [0, 1], duration: 420, ease: "outQuad" }, 200);
+
+    trigger(card, anim, g);
+  });
+
+  startWatchdog();
 })();
 </script>
 </body>
