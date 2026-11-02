@@ -1142,24 +1142,26 @@ footer{
 </script>
 
 <script type="module">
-/* 滚动动效（anime.js v4.5.0，自托管于本仓库）。滚动只负责触发，
-   动画独立播完，快速滚动也不会卡在半透明。三重降级：偏好减少动效、
-   库加载失败、动画未触发或未跑完时，内容都会正常显示。 */
+/* 滚动动效（anime.js v4.5.0，自托管于本仓库）。
+   触发由本文件自己的滚动检测负责：每个元素进入视野才播，被快速滚过的
+   直接显示，保证任何滚动方式下都不会留下空白。
+   三重降级：偏好减少动效、库加载失败、动画异常时均退回静态显示。 */
 (async function(){
   if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   var lib;
   try {
-    lib = await import("./anime.esm.min.js");          /* 同源自托管，anime.js v4.5.0 */
+    lib = await import("./anime.esm.min.js");          /* 同源自托管 */
   } catch (err) {
     try { lib = await import("https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.esm.min.js"); }
     catch (err2) { return; }
   }
 
-  var createTimeline = lib.createTimeline, onScroll = lib.onScroll,
+  var createTimeline = lib.createTimeline, animate = lib.animate,
       stagger = lib.stagger, utils = lib.utils;
 
-  var groups = [];
+  var ENTER_MARGIN = 110;   /* 元素顶部进入视野这么多像素后开始播 */
+  var pending = [];
 
   function toArray(x){
     if (!x) return [];
@@ -1177,75 +1179,79 @@ footer{
       (vars || []).forEach(function(v){ el.style.removeProperty(v); });
     });
   }
-
-  /* 触发器：进入视口播一次，动画此后独立运行 */
-  function trigger(target, timeline, group){
-    var played = false;
-    onScroll({
-      target: target, repeat: false,
-      enter: { target: "top", container: "bottom-=70" },
-      onEnter: function(){
-        if (played) return;
-        played = true; group.started = true; timeline.play();
-      }
-    });
+  function register(probe, play, reveal){
+    pending.push({ probe: probe, play: play, reveal: reveal });
   }
 
-  /* 安全网：已在视口内却仍未显示完全的元素，直接恢复 */
-  function startWatchdog(){
-    if (!groups.length) return;
-    var t0 = Date.now();
-    var id = setInterval(function(){
-      var pending = 0;
-      groups.forEach(function(g){
-        if (g.done) return;
-        pending++;
-        var r = g.probe.getBoundingClientRect();
-        var inView = r.top < (window.innerHeight || 0) * 0.95 && r.bottom > 0;
-        if (!inView) return;
-        var stalled = parseFloat(getComputedStyle(g.probe).opacity) < 0.99;
-        if (stalled && (!g.started || Date.now() - t0 > 4000)) { g.reveal(); g.done = true; }
-      });
-      if (!pending || Date.now() - t0 > 90000) clearInterval(id);
-    }, 700);
+  /* 滚动检测：进入视野的播放，已划过的直接显示 */
+  function check(){
+    if (!pending.length) return;
+    var vh = window.innerHeight || 0;
+    for (var i = pending.length - 1; i >= 0; i--) {
+      var g = pending[i];
+      var r = g.probe.getBoundingClientRect();
+      if (r.bottom < -40) { pending.splice(i, 1); g.reveal(); }
+      else if (r.top < vh - ENTER_MARGIN) { pending.splice(i, 1); g.play(); }
+    }
   }
+  var queued = false;
+  function onScrollTick(){
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function(){ queued = false; check(); });
+  }
+  window.addEventListener("scroll", onScrollTick, { passive: true });
+  window.addEventListener("resize", onScrollTick, { passive: true });
 
-  /* ---------- 时间线：竖线绘制 + 日期滑入 + 节点弹出 ---------- */
+  /* ---------- 时间线：每行进入视野时触发，竖线逐节生长 ---------- */
   var tlRoot = document.querySelector(".timeline");
   if (tlRoot) {
-    var items  = tlRoot.querySelectorAll(".tl-item");
-    var dates  = tlRoot.querySelectorAll(".tl-date");
-    var bodies = tlRoot.querySelectorAll(".tl-body");
+    var items = tlRoot.querySelectorAll(".tl-item");
+    var total = items.length, drawn = 0, settled = 0;
 
     takeOver(items);
     tlRoot.classList.add("is-animating");
     utils.set(tlRoot, { "--tl-draw": 0 });
-    utils.set(items,  { "--tl-dot": 0, "--tl-dot-o": 0 });
-    utils.set(dates,  { opacity: 0, x: -14 });
-    utils.set(bodies, { opacity: 0, x: 12 });
 
-    var tlGroup = { probe: dates[0] || tlRoot, started: false, done: false };
-    tlGroup.reveal = function(){
-      tlRoot.classList.remove("is-animating");
-      tlRoot.style.removeProperty("--tl-draw");
-      clearInline(items, ["--tl-dot", "--tl-dot-o"]);
-      clearInline(dates); clearInline(bodies);
-      tlGroup.done = true;
+    var settle = function(){
+      if (++settled >= total) {
+        tlRoot.classList.remove("is-animating");
+        tlRoot.style.removeProperty("--tl-draw");
+      }
     };
-    groups.push(tlGroup);
+    var growLine = function(i){
+      var next = (i + 1) / total;
+      if (next > drawn) {
+        drawn = next;
+        animate(tlRoot, { "--tl-draw": next, duration: 600, ease: "outQuad" });
+      }
+    };
 
-    var tlAnim = createTimeline({ autoplay: false, onComplete: tlGroup.reveal })
-      .add(tlRoot, { "--tl-draw": [0, 1], duration: 1200, ease: "outQuad" }, 0)
-      .add(dates,  { opacity: [0, 1], x: [-14, 0], duration: 540, ease: "outQuad",
-                     delay: stagger(68) }, 160)
-      .add(bodies, { opacity: [0, 1], x: [12, 0], duration: 580, ease: "outQuad",
-                     delay: stagger(68) }, 190)
-      .add(items,  { "--tl-dot-o": [0, 1], duration: 260, ease: "outQuad",
-                     delay: stagger(68) }, 200)
-      .add(items,  { "--tl-dot": [0, 1], duration: 520, ease: "outBack(2.2)",
-                     delay: stagger(68) }, 200);
+    Array.prototype.forEach.call(items, function(item, i){
+      var date = item.querySelector(".tl-date");
+      var body = item.querySelector(".tl-body");
 
-    trigger(tlRoot, tlAnim, tlGroup);
+      utils.set(item, { "--tl-dot": 0, "--tl-dot-o": 0 });
+      utils.set(date, { opacity: 0, x: -16 });
+      utils.set(body, { opacity: 0, x: 14 });
+
+      var finish = function(){
+        clearInline(item, ["--tl-dot", "--tl-dot-o"]);
+        clearInline(date); clearInline(body);
+        settle();
+      };
+
+      register(date,
+        function(){
+          growLine(i);
+          createTimeline({ autoplay: true, onComplete: finish })
+            .add(date, { opacity: [0, 1], x: [-16, 0], duration: 560, ease: "outQuad" }, 0)
+            .add(body, { opacity: [0, 1], x: [14, 0], duration: 600, ease: "outQuad" }, 60)
+            .add(item, { "--tl-dot-o": [0, 1], duration: 260, ease: "outQuad" }, 80)
+            .add(item, { "--tl-dot": [0, 1], duration: 520, ease: "outBack(2.4)" }, 80);
+        },
+        function(){ drawn = Math.max(drawn, (i + 1) / total); finish(); });
+    });
   }
 
   /* ---------- 职业经历：卡片上浮 + 要点依次进入 + 标签弹出 ---------- */
@@ -1260,26 +1266,32 @@ footer{
     utils.set(bullets, { opacity: 0, x: -10 });
     utils.set(tags,    { opacity: 0, scale: 0.82 });
 
-    var g = { probe: card, started: false, done: false };
-    g.reveal = function(){
+    var finish = function(){
       clearInline(card); clearInline(role);
       clearInline(bullets); clearInline(tags);
-      g.done = true;
     };
-    groups.push(g);
 
-    var anim = createTimeline({ autoplay: false, onComplete: g.reveal })
-      .add(card,    { opacity: [0, 1], y: [30, 0], duration: 640, ease: "outQuad" }, 0)
-      .add(bullets, { opacity: [0, 1], x: [-10, 0], duration: 460, ease: "outQuad",
-                      delay: stagger(62) }, 240)
-      .add(tags,    { opacity: [0, 1], scale: [0.82, 1], duration: 440,
-                      ease: "outBack(2.4)", delay: stagger(48) }, 400);
-    if (role) anim.add(role, { opacity: [0, 1], duration: 420, ease: "outQuad" }, 200);
-
-    trigger(card, anim, g);
+    register(card,
+      function(){
+        var anim = createTimeline({ autoplay: true, onComplete: finish })
+          .add(card,    { opacity: [0, 1], y: [30, 0], duration: 640, ease: "outQuad" }, 0)
+          .add(bullets, { opacity: [0, 1], x: [-10, 0], duration: 460, ease: "outQuad",
+                          delay: stagger(62) }, 240)
+          .add(tags,    { opacity: [0, 1], scale: [0.82, 1], duration: 440,
+                          ease: "outBack(2.4)", delay: stagger(48) }, 400);
+        if (role) anim.add(role, { opacity: [0, 1], duration: 420, ease: "outQuad" }, 200);
+      },
+      finish);
   });
 
-  startWatchdog();
+  /* 兜底：定时扫一遍，任何仍未显示且已在视野内的元素立即恢复 */
+  var t0 = Date.now();
+  var sweep = setInterval(function(){
+    check();
+    if (!pending.length || Date.now() - t0 > 120000) clearInterval(sweep);
+  }, 600);
+
+  check();   /* 首屏即检查一次 */
 })();
 </script>
 </body>
